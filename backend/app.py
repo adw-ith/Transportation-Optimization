@@ -11,7 +11,7 @@ import traceback
 
 
 app = Flask(__name__)
-MODEL_URL = "http://127.0.0.1:6000/solve"   # replace with your TSP model endpoint
+MODEL_URL = "http://127.0.0.1:6000/solve" 
 
 def prepare_and_send_to_model(backend_json, graphhopper_result, distance_matrix):
     """
