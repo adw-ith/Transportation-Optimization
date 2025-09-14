@@ -1,0 +1,63 @@
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=3, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=2, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=3, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=2, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=3, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=2, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=2, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=1, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=2, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=1, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=2, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=1, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+Error occurred:
+Traceback (most recent call last):
+  File "D:\Cognizant\model\app.py", line 47, in solve
+    result = run_simulation(locations, routes, custom_packages, custom_vehicles, headless=True)
+  File "D:\Cognizant\model\test.py", line 142, in run_simulation
+    # --- Run Agent Simulation ---
+  File "D:\Cognizant\transport-optimization-frontend\venv\lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "D:\Cognizant\transport-optimization-frontend\venv\lib\site-packages\keras\src\saving\saving_lib.py", line 645, in _raise_loading_failure
+    raise ValueError(msg)
+ValueError: A total of 1 objects could not be loaded. Example error message for object <Dense name=dense, built=True>:
+
+The shape of the target variable and the shape of the target value in `variable.assign(value)` must match. variable.shape=(50, 256), Received: value.shape=(60, 256). Target variable: <Variable path=dense/kernel, shape=(50, 256), dtype=float32, value=[[ 0.08555092 -0.00259994  0.06909104 ... -0.08965383 -0.13468984
+   0.03646918]
+ [-0.05000524 -0.08821529 -0.12722939 ...  0.07060502 -0.11265209
+  -0.12422643]
+ [-0.11248188 -0.12511614  0.10317704 ... -0.12842977 -0.02838223
+   0.08734557]
+ ...
+ [-0.04377952 -0.01505533 -0.03150833 ... -0.1250444  -0.09662608
+  -0.06856325]
+ [-0.10862538 -0.10119098  0.05334426 ...  0.02239668  0.12373798
+  -0.12045576]
+ [-0.01533914 -0.07200858  0.11848821 ... -0.0234552   0.10134749
+   0.11883856]]>
+
+List of objects that could not be loaded:
+[<Dense name=dense, built=True>]
+locations = ['mumbai', 'chennai', 'delhi'] routes = [Route(start_location='mumbai', end_location='chennai', distance=1233.45), Route(start_location='mumbai', end_location='delhi', distance=1403.45), Route(start_location='chennai', end_location='mumbai', distance=1230.31), Route(start_location='chennai', end_location='delhi', distance=2196.57), Route(start_location='delhi', end_location='mumbai', distance=1395.75), Route(start_location='delhi', end_location='chennai', distance=2185.43)] packages = [Package(id=0, pickup_location='mumbai', delivery_location='chennai', weight=1, status=0), Package(id=1, pickup_location='mumbai', delivery_location='delhi', weight=2, status=0)] vehicles = [Vehicle(id=0, capacity=1000, current_location='mumbai', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+Error occurred:
+Traceback (most recent call last):
+  File "D:\Cognizant\model\app.py", line 47, in solve
+    result = run_simulation(locations, routes, custom_packages, custom_vehicles, headless=True)
+  File "D:\Cognizant\model\test.py", line 145, in run_simulation
+    agent.q_network.load_weights(MODEL_WEIGHTS_PATH)
+  File "D:\Cognizant\transport-optimization-frontend\venv\lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "D:\Cognizant\transport-optimization-frontend\venv\lib\site-packages\keras\src\saving\saving_lib.py", line 645, in _raise_loading_failure
+    raise ValueError(msg)
+ValueError: A total of 1 objects could not be loaded. Example error message for object <Dense name=dense, built=True>:
+
+The shape of the target variable and the shape of the target value in `variable.assign(value)` must match. variable.shape=(50, 256), Received: value.shape=(60, 256). Target variable: <Variable path=dense/kernel, shape=(50, 256), dtype=float32, value=[[-0.03299808 -0.0517136  -0.08088529 ...  0.04348245  0.08066134
+   0.06405513]
+ [-0.09252997 -0.13309252 -0.07631094 ... -0.11301779  0.10581084
+   0.01288995]
+ [-0.04566726  0.04949789  0.09787726 ... -0.09973556 -0.07843034
+  -0.00139177]
+ ...
+ [-0.13880488  0.12246238  0.02390906 ...  0.0124962   0.02260053
+   0.045955  ]
+ [ 0.11536999 -0.03033844 -0.02476791 ...  0.01976787 -0.09793949
+  -0.09930852]
+ [ 0.10045454 -0.13497311 -0.03237318 ...  0.13450716  0.04893778
+  -0.12232046]]>
+
+List of objects that could not be loaded:
+[<Dense name=dense, built=True>]
