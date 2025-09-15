@@ -668,7 +668,7 @@ class ImprovedLogisticsEnvironment:
             'total_cost': self.total_cost
         }
         
-        return self._get_state(), reward, done, 
+        return self._get_state(), reward, done, {}
 
 
 class DuelingDQNNetwork(keras.Model):

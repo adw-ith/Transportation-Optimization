@@ -12,3 +12,23 @@ Traceback (most recent call last):
   File "D:\Cognizant\model\inference.py", line 180, in optimize_routes
     next_state, reward, done, info = self.env.step(action)
 ValueError: not enough values to unpack (expected 4, got 3)
+LOCATIONS = ['kochi', 'aluva', 'kothamangalam']
+ROUTES = [Route(start_location='kochi', end_location='aluva', distance=25.93), Route(start_location='kochi', end_location='kothamangalam', distance=77.56), Route(start_location='aluva', end_location='kochi', distance=25.95), Route(start_location='aluva', end_location='kothamangalam', distance=51.0), Route(start_location='kothamangalam', end_location='kochi', distance=77.64), Route(start_location='kothamangalam', end_location='aluva', distance=50.98)]
+CUSTOM_PACKAGES = [Package(id=0, pickup_location='kochi', delivery_location='aluva', weight=1, status=0), Package(id=1, pickup_location='kochi', delivery_location='kothamangalam', weight=1, status=0)]
+CUSTOM_VEHICLES = [Vehicle(id=0, capacity=1000, current_location='kochi', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+SCENARIO_JSON = {'locations': ['kochi', 'aluva', 'kothamangalam'], 'routes': [{'start': 'kochi', 'end': 'aluva', 'distance': 25.93}, {'start': 'kochi', 'end': 'kothamangalam', 'distance': 77.56}, {'start': 'aluva', 'end': 'kochi', 'distance': 25.95}, {'start': 'aluva', 'end': 'kothamangalam', 'distance': 51.0}, {'start': 'kothamangalam', 'end': 'kochi', 'distance': 77.64}, {'start': 'kothamangalam', 'end': 'aluva', 'distance': 50.98}], 'packages': [{'id': 0, 'pickup': 'kochi', 'delivery': 'aluva', 'weight': 1, 'priority': 0}, {'id': 1, 'pickup': 'kochi', 'delivery': 'kothamangalam', 'weight': 1, 'priority': 0}], 'vehicles': [{'id': 1, 'capacity': 1000, 'location': 'Kottayam', 'speed': 1.0, 'cost_per_km': 1.0}]}
+Error occurred:
+Traceback (most recent call last):
+  File "D:\python\MAIN\Transportation-Optimization\model\app.py", line 93, in solve
+    result = run_with_json(scenario_json)
+  File "D:\python\MAIN\Transportation-Optimization\model\test.py", line 143, in run_with_json
+    result = optimizer.optimize_routes(scenario_data)
+  File "D:\python\MAIN\Transportation-Optimization\model\inference.py", line 180, in optimize_routes
+    next_state, reward, done, info = self.env.step(action)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: not enough values to unpack (expected 4, got 3)
+LOCATIONS = ['kochi', 'aluva', 'kothamangalam']
+ROUTES = [Route(start_location='kochi', end_location='aluva', distance=25.93), Route(start_location='kochi', end_location='kothamangalam', distance=77.56), Route(start_location='aluva', end_location='kochi', distance=25.95), Route(start_location='aluva', end_location='kothamangalam', distance=51.0), Route(start_location='kothamangalam', end_location='kochi', distance=77.64), Route(start_location='kothamangalam', end_location='aluva', distance=50.98)]
+CUSTOM_PACKAGES = [Package(id=0, pickup_location='kochi', delivery_location='aluva', weight=2, status=0), Package(id=1, pickup_location='kochi', delivery_location='kothamangalam', weight=1, status=0)]
+CUSTOM_VEHICLES = [Vehicle(id=0, capacity=1000, current_location='kochi', speed=1.0, cost_per_km=1.0, available_at_time=0)]
+SCENARIO_JSON = {'locations': ['kochi', 'aluva', 'kothamangalam'], 'routes': [{'start': 'kochi', 'end': 'aluva', 'distance': 25.93}, {'start': 'kochi', 'end': 'kothamangalam', 'distance': 77.56}, {'start': 'aluva', 'end': 'kochi', 'distance': 25.95}, {'start': 'aluva', 'end': 'kothamangalam', 'distance': 51.0}, {'start': 'kothamangalam', 'end': 'kochi', 'distance': 77.64}, {'start': 'kothamangalam', 'end': 'aluva', 'distance': 50.98}], 'packages': [{'id': 0, 'pickup': 'kochi', 'delivery': 'aluva', 'weight': 2, 'priority': 0}, {'id': 1, 'pickup': 'kochi', 'delivery': 'kothamangalam', 'weight': 1, 'priority': 0}], 'vehicles': [{'id': 1, 'capacity': 1000, 'location': 'Kottayam', 'speed': 1.0, 'cost_per_km': 1.0}]}
