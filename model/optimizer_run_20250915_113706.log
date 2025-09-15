@@ -1,0 +1,7 @@
+2025-09-15 11:37:06,859 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:6000
+2025-09-15 11:37:06,859 [INFO] [33mPress CTRL+C to quit[0m
+2025-09-15 11:37:20,347 [INFO] data: {'locations': ['kochi', 'aluva', 'kothamangalam'], 'routes': [{'start': 'kochi', 'end': 'aluva', 'distance': 25.93}, {'start': 'kochi', 'end': 'kothamangalam', 'distance': 77.56}, {'start': 'aluva', 'end': 'kochi', 'distance': 25.95}, {'start': 'aluva', 'end': 'kothamangalam', 'distance': 51.0}, {'start': 'kothamangalam', 'end': 'kochi', 'distance': 77.64}, {'start': 'kothamangalam', 'end': 'aluva', 'distance': 50.98}], 'packages': [{'id': 0, 'pickup': 'kochi', 'delivery': 'aluva', 'weight': 2, 'priority': 0}, {'id': 1, 'pickup': 'kochi', 'delivery': 'kothamangalam', 'weight': 1, 'priority': 0}], 'vehicles': [{'id': 1, 'capacity': 1000, 'location': 'Kottayam', 'speed': 1.0, 'cost_per_km': 1.0}]}
+2025-09-15 11:37:20,349 [INFO] Loading model from 'logistics_model_v3.weights.h5'...
+2025-09-15 11:37:20,843 [INFO] Running optimization...
+2025-09-15 11:37:20,861 [INFO] 127.0.0.1 - - [15/Sep/2025 11:37:20] "[35m[1mPOST /solve HTTP/1.1[0m" 500 -

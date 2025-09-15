@@ -362,7 +362,7 @@ class DQNAgent:
 
 # --- Main Training and Execution Logic ---
 
-def train_optimizer(episodes=2000, model_path="logistics_model.weights.h5"):
+def train_optimizer(episodes=2000, model_path="logistics_model_v3.weights1.h5"):
     # UPDATED: Define the logistics network
     LOCATIONS = ["Warehouse A", "Hub B", "City Center C", "Suburb D", "Industrial E"]
     ROUTES = [

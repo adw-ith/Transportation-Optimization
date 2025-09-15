@@ -1,168 +1,166 @@
-import numpy as np
-import os
-import tensorflow as tf
-import networkx as nx
-from train import LogisticsEnvironment, DQNAgent, Package, Vehicle
+import json
+import argparse
+import sys
+import utils
 
-# Define the dimensions the model was originally trained with
-TRAINING_N_PACKAGES = 10
-TRAINING_N_VEHICLES = 3
 
-def run_agent_simulation(env, agent):
-    """Runs the simulation using the trained RL agent and returns the results."""
-    state = env._get_state()
-    total_reward = 0
-    vehicle_paths = {v.id: [] for v in env.vehicles if v.capacity > 0}
-    num_real_packages = sum(1 for p in env.packages if p.status != 2)
+# Assumes your optimizer class is in 'optimizer.py'.
+# Change this if you placed the LogisticsOptimizer in a different file (e.g., from agent import LogisticsOptimizer)
+try:
+    from inference import LogisticsOptimizer
+except ImportError:
+    print("Error: Could not find the 'LogisticsOptimizer' class.")
+    print("Please ensure it is in a file named 'inference.py' or update the import statement in test.py.")
+    sys.exit(1)
 
-    while True:
-        available_vehicle = min(env.vehicles, key=lambda v: v.available_at_time)
-        current_time = available_vehicle.available_at_time
-        action = agent.act(state)
-        
-        package = env.packages[action]
-        # Record the path taken by the vehicle for this action
-        if package.status == 0 and package.weight <= available_vehicle.capacity:
-            start_loc = available_vehicle.current_location
-            pickup_loc = package.pickup_location
-            delivery_loc = package.delivery_location
-            vehicle_paths[available_vehicle.id].append((start_loc, pickup_loc))
-            vehicle_paths[available_vehicle.id].append((pickup_loc, delivery_loc))
 
-        next_state, reward, _, _ = env.step(action)
-        state = next_state
-        total_reward += reward
-        
-        real_packages_delivered = sum(1 for p in env.packages[:num_real_packages] if p.status == 2)
-        if real_packages_delivered == num_real_packages or current_time >= env.max_time:
-            break
+def pretty_print_results(result: dict):
+    """Formats and prints the optimization results in a readable way."""
+    
+    print("\n" + "="*25)
+    print("  OPTIMIZATION COMPLETE")
+    print("="*25 + "\n")
+
+    # --- Metrics Summary ---
+    print("📊 METRICS SUMMARY")
+    print("-"*25)
+    metrics = result.get("metrics", {})
+    success = "✅ SUCCESS" if result.get("success") else "❌ FAILED"
+    print(f"  Overall Status: {success}")
+    print(f"  Delivery Rate:  {metrics.get('delivery_rate', 0) * 100:.1f}% ({metrics.get('packages_delivered', 0)}/{metrics.get('total_packages', 0)})")
+    print(f"  Total Time:     {metrics.get('total_time', 0):.2f} units")
+    print(f"  Total Distance: {metrics.get('total_distance', 0):.2f} km")
+    print(f"  Total Cost:     ${metrics.get('total_cost', 0):.2f}")
+    print(f"  Vehicles Used:  {metrics.get('vehicles_used', 0)}")
+    print("-"*25 + "\n")
+
+    # --- Execution Plan ---
+    print("🚛 EXECUTION PLAN (Timeline)")
+    print("-"*25)
+    plan = result.get("execution_plan", [])
+    if not plan:
+        print("  No actions were taken.")
+    else:
+        for step in plan:
+            time = step['time']
+            v_id = step['vehicle_id']
+            action = step['action']
             
-    return {"time": env.current_time, "reward": total_reward, "paths": vehicle_paths}
+            if action == 'move_to':
+                dest = step['destination']
+                print(f"  [T={time:<6.1f}] Vehicle {v_id} -> Moves to {dest}")
+                if step.get('deliveries'):
+                    print(f"    {'':<10} ✔️  Delivers packages: {step['deliveries']}")
+                if step.get('pickups'):
+                    print(f"    {'':<10} 📦 Picks up packages: {step['pickups']}")
+            elif action == 'wait':
+                duration = step['duration']
+                print(f"  [T={time:<6.1f}] Vehicle {v_id} -> Waits for {duration} units")
+    print("-"*25 + "\n")
 
-def run_baseline_simulation(env):
-    """Runs a baseline First-Come, First-Served simulation and returns the results."""
-    vehicle_paths = {v.id: [] for v in env.vehicles if v.capacity > 0}
-    num_real_packages = sum(1 for p in env.packages if p.status != 2)
+    # --- Vehicle Routes ---
+    print("🗺️ FINAL VEHICLE ROUTES")
+    print("-"*25)
+    routes = result.get("vehicle_routes", {})
+    if not routes:
+        print("  No vehicle routes were generated.")
+    else:
+        for v_id, route_list in routes.items():
+            route_str = " -> ".join(route_list)
+            print(f"  Vehicle {v_id}: {route_str}")
+    print("-"*25 + "\n")
     
-    # Process packages in their defined order
-    for package_id in range(num_real_packages):
-        available_vehicle = min(env.vehicles, key=lambda v: v.available_at_time)
-        
-        package = env.packages[package_id]
-        if package.status == 0 and package.weight <= available_vehicle.capacity:
-            start_loc = available_vehicle.current_location
-            pickup_loc = package.pickup_location
-            delivery_loc = package.delivery_location
-            vehicle_paths[available_vehicle.id].append((start_loc, pickup_loc))
-            vehicle_paths[available_vehicle.id].append((pickup_loc, delivery_loc))
-        
-        env.step(package_id)
+    # --- Undelivered Packages ---
+    undelivered = result.get("undelivered_packages", [])
+    if undelivered:
+        print("⚠️ UNDELIVERED PACKAGES")
+        print("-"*25)
+        print(f"  The following package IDs were not delivered: {undelivered}")
+        print("-"*25 + "\n")
 
-    return {"time": env.current_time, "paths": vehicle_paths}
 
-"""
-def visualize_routes(locations, routes, agent_paths, baseline_paths, agent_time, baseline_time):
-    Creates a side-by-side plot of the agent's and baseline's routes.
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8))
-    fig.suptitle('Route Visualization: RL Agent vs. Baseline', fontsize=16)
+import json
+from inference import LogisticsOptimizer
+#from utils import pretty_print_results  # adjust import if needed
 
-    G = nx.Graph()
-    for loc in locations:
-        G.add_node(loc)
-    for route in routes:
-        G.add_edge(route.start_location, route.end_location, weight=route.distance)
-
-    pos = nx.spring_layout(G, seed=42)
-    colors = plt.cm.viridis(np.linspace(0, 1, len(agent_paths)))
-
-    # Plot Agent Routes
-    ax1.set_title(f'RL Agent Routes (Total Time: {agent_time:.2f})')
-    nx.draw(G, pos, ax=ax1, with_labels=True, node_color='lightblue', node_size=2000, font_size=10)
-    for (vehicle_id, path_list), color in zip(agent_paths.items(), colors):
-        for start, end in path_list:
-            if start != end:
-                ax1.annotate("", xy=pos[end], xycoords='data', xytext=pos[start], textcoords='data',
-                             arrowprops=dict(arrowstyle="->", color=color, shrinkA=15, shrinkB=15,
-                                             patchA=None, patchB=None, connectionstyle="arc3,rad=0.1"))
-
-    # Plot Baseline Routes
-    ax2.set_title(f'Baseline FCFS Routes (Total Time: {baseline_time:.2f})')
-    nx.draw(G, pos, ax=ax2, with_labels=True, node_color='lightblue', node_size=2000, font_size=10)
-    for (vehicle_id, path_list), color in zip(baseline_paths.items(), colors):
-        for start, end in path_list:
-            if start != end:
-                ax2.annotate("", xy=pos[end], xycoords='data', xytext=pos[start], textcoords='data',
-                             arrowprops=dict(arrowstyle="->", color=color, shrinkA=15, shrinkB=15,
-                                             patchA=None, patchB=None, connectionstyle="arc3,rad=0.1"))
+def run_with_json(scenario_data, model_path="logistics_model_v3.weights.h5"):
+    """
+    Run optimization directly with a scenario JSON (dict).
     
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-"""
+    :param scenario_data: Python dict representing the scenario.
+    :param model_path: Path to trained model weights.
+    :return: optimization result (dict).
+    """
+    # --- Load Model ---
+    try:
+        print(f"Loading model from '{model_path}'...")
+        optimizer = LogisticsOptimizer(model_path=model_path)
+    except Exception as e:
+        raise RuntimeError(f"Could not load the model: {e}")
 
-"""
-def plot_efficiency_comparison(agent_time, baseline_time):
-    Creates a bar chart comparing the total time taken.
-    plt.figure(figsize=(8, 6))
-    strategies = ['RL Agent', 'Baseline (FCFS)']
-    times = [agent_time, baseline_time]
-    
-    bars = plt.bar(strategies, times, color=['#4CAF50', '#F44336'])
-    plt.ylabel('Total Time to Complete Deliveries')
-    plt.title('Efficiency Comparison')
-    plt.ylim(0, max(times) * 1.2)
+    # --- Run Optimization ---
+    print("Running optimization...")
+    result = optimizer.optimize_routes(scenario_data)
 
-    for bar in bars:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2.0, yval + 1, f'{yval:.2f}', ha='center', va='bottom')
-"""
+    # --- Print Results ---
+    #pretty_print_results(result)
+    utils.pretty_print_results(result)
+    return result
 
-def setup_environment(locations, routes, packages, vehicles):
-    """Pads a scenario and initializes the environment."""
-    num_real_packages = len(packages)
-    num_real_vehicles = len(vehicles)
-    padded_packages = list(packages)
-    padded_vehicles = list(vehicles)
 
-    while len(padded_packages) < TRAINING_N_PACKAGES:
-        padded_packages.append(Package(id=len(padded_packages), pickup_location=locations[0], delivery_location=locations[0], weight=0, status=2))
-    
-    while len(padded_vehicles) < TRAINING_N_VEHICLES:
-        padded_vehicles.append(Vehicle(id=len(padded_vehicles), capacity=0, current_location=locations[0], speed=1.0, cost_per_km=1.0, available_at_time=float('inf')))
+import logging
+from datetime import datetime
 
-    env = LogisticsEnvironment(locations, routes, n_packages=TRAINING_N_PACKAGES, n_vehicles=TRAINING_N_VEHICLES)
-    env.packages = padded_packages
-    env.vehicles = padded_vehicles
-    return env
+# --- Setup logging ---
+log_filename = f"optimizer_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(log_filename, mode="w"),
+        logging.StreamHandler()   # keeps printing to console too
+    ]
+)
 
-def run_simulation(locations, routes, packages, vehicles, headless=True):
-    MODEL_WEIGHTS_PATH = "logistics_model.weights.h5"
-    if not os.path.exists(MODEL_WEIGHTS_PATH):
-        # Instead of just printing, raise an error that Flask can catch
-        raise FileNotFoundError(f"Model file not found at '{MODEL_WEIGHTS_PATH}'")
+# Redirect print -> logging
+print = lambda *args, **kwargs: logging.info(" ".join(map(str, args)))
 
-    # --- Run Agent Simulation ---
-    agent_env = setup_environment(locations, routes, packages, vehicles)
-    agent = DQNAgent(agent_env.state_size, agent_env.action_space_size)
-    agent.q_network.load_weights(MODEL_WEIGHTS_PATH)
-    agent.epsilon = 0.0
-    agent_results = run_agent_simulation(agent_env, agent)
 
-    # --- Run Baseline Simulation ---
-    baseline_env = setup_environment(locations, routes, packages, vehicles)
-    baseline_results = run_baseline_simulation(baseline_env)
+def run_with_json(scenario_data, model_path="logistics_model_v3.weights.h5"):
+    """
+    Run the logistics optimizer with a JSON dict (not a file).
+    """
+    print("data:", scenario_data)
+    try:
+        print(f"Loading model from '{model_path}'...")
+        optimizer = LogisticsOptimizer(model_path=model_path)
+    except Exception as e:
+        logging.error(f"Could not load model weights from '{model_path}'. Error: {e}")
+        return {"error": str(e)}
 
-    # --- Generate Visualizations ---
-    """if not headless:  # only in standalone testing
-        visualize_routes(
-            locations, routes,
-            agent_results['paths'], baseline_results['paths'],
-            agent_results['time'], baseline_results['time']
-        )
-        plot_efficiency_comparison(agent_results['time'], baseline_results['time'])
-        plt.show()
-"""
-    return {"agent": agent_results, "baseline": baseline_results}
+    # Run optimization
+    print("Running optimization...")
+    result = optimizer.optimize_routes(scenario_data)
+
+    # Pretty print results
+    try:
+        pretty_print_results(result)
+    except Exception as e:
+        logging.warning(f"Pretty print failed: {e}")
+
+    return result
+
 
 if __name__ == "__main__":
-    # Example usage with custom scenario
-    from custom import locations,routes,packages,vehicles
-    run_simulation(locations,routes,packages,vehicles,headless = False)
+    # Example usage if running standalone
+    import json
+    scenario_file = "custom_scenario.json"
+
+    try:
+        with open(scenario_file, "r") as f:
+            scenario_data = json.load(f)
+    except Exception as e:
+        logging.error(f"Failed to load scenario file '{scenario_file}': {e}")
+        sys.exit(1)
+
+    run_with_json(scenario_data)
